@@ -274,7 +274,19 @@ public class Operations {
 	}
 
 	public void Monitor(String File) {
-		
+		Video v = deserial(File);
+		if(Dfault.Resume){
+			c.seek(v.Time);
+		}else if(Dfault.Ask){
+			int resp = frame1();
+			if(resp == JOptionPane.YES_OPTION){
+				c.seek(v.Time);
+			}else{
+				c.seek(0);
+			}
+		}else{
+			c.seek(0);
+		}
 	}
 
 	public void onClose() {
