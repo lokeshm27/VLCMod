@@ -14,7 +14,6 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -38,6 +37,7 @@ public class Operations {
 	public final CountDownLatch latch2 = new CountDownLatch(1);
 	public final CountDownLatch latch3 = new CountDownLatch(1);
 	static int ret;
+	Date Session;
 
 	public Operations() {
 		try {
@@ -69,6 +69,7 @@ public class Operations {
 	public void setrunFlag() {
 		try {
 			Date date = new Date();
+			Session = date; 
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(runFlag));
 			oos.writeObject(date);
 			oos.close();
@@ -188,14 +189,41 @@ public class Operations {
 		}else{
 			File file = new File(Dir + "\\" + encode(Path) + ".dat");
 			if(file.exists()){
-				return false;
+				try {
+					ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+					Date date = (Date) in.readObject();
+					in.close();
+					if(date.equals(Session)){
+						return true;
+					}else{
+						return false;
+					}
+				} catch (Exception e) {
+					errorHandler(134, e.getMessage(), "itsWorth", "Operations", true);
+				}
+				return null != null;
 			}else{
 				return true;
 			}
 		}
 	}
 	
-
+	public void setWorth(String Path){
+		String Dir = Cache + "PlayList";
+		File PlayDir = new File(Dir);
+		if(!(PlayDir.exists())){
+			PlayDir.mkdir();
+		}
+		File datFile = new File(Dir + "//" + encode(Path) + ".dat");
+		try {
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(datFile));
+			out.writeObject(Session);
+			out.close();
+		}catch (Exception e) {
+			errorHandler(135,  e.getMessage(), "setWorth", "Operations", true);
+		}
+	}
+	
 	public void serial(Video v) {
 		try {
 			File vid = new File(v.Path);
