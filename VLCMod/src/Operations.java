@@ -179,6 +179,23 @@ public class Operations {
 		return null;
 	}
 
+	public boolean itsWorth(String Path){
+		String Dir = Cache + "PlayList";
+		File PlayDir = new File(Dir);
+		if(!(PlayDir.exists())){
+			PlayDir.mkdir();
+			return false;
+		}else{
+			File file = new File(Dir + "\\" + encode(Path) + ".dat");
+			if(file.exists()){
+				return false;
+			}else{
+				return true;
+			}
+		}
+	}
+	
+
 	public void serial(Video v) {
 		try {
 			File vid = new File(v.Path);
