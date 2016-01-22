@@ -43,7 +43,7 @@ public class Operations {
 		try {
 			File set = new File(Data + "Settings.dat");
 			if (!set.exists()) {
-				Dfault = new Settings(2, 2);
+				Dfault = new Settings(2, 2, true);
 			} else {
 				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(set));
 				Dfault = (Settings) ois.readObject();
