@@ -134,6 +134,13 @@ public class Operations {
 		}
 		System.exit(-1);
 	}
+	
+	public void add(String Path){
+		if(itsWorth(Path)){
+			setWorth(Path);
+			c.add(Path);
+		}
+	}
 
 	public void process(Package P) {
 		if (P.command.equals("playLast")) {
@@ -194,14 +201,14 @@ public class Operations {
 					Date date = (Date) in.readObject();
 					in.close();
 					if(date.equals(Session)){
-						return true;
-					}else{
 						return false;
+					}else{
+						return true;
 					}
 				} catch (Exception e) {
 					errorHandler(134, e.getMessage(), "itsWorth", "Operations", true);
 				}
-				return null != null;
+				return false;
 			}else{
 				return true;
 			}
