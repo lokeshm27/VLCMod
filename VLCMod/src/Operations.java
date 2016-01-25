@@ -21,6 +21,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.apache.commons.io.FilenameUtils;
+
 public class Operations {
 	String Dir = new String("C:\\ProgramData\\VLCMod\\");
 	String Bin = new String(Dir + "Bin\\");
@@ -141,18 +143,29 @@ public class Operations {
 			c.add(Path);
 		}
 	}
+	
+	public void clearPlayList(){
+		String Dir = Cache + "PlayList";
+		File PlayDir = new File(Dir);
+		if(PlayDir.exists()){
+			File list[] = PlayDir.listFiles();
+			for(int i = 0; i < list.length; i++){
+				list[i].delete();
+			}
+			PlayDir.delete();
+		}
+	}
 
 	public void process(Package P) {
 		if (P.command.equals("playLast")) {
 			Video V = getLastPlayed(P.File);
-			add(V.Path);
-			Monitor(V.Path);
+			c.add(V.Path);
 		} else {
 			if (P.command.equals("add") || P.command.equals("play")) {
-				add(P.File);
-				Monitor(P.File);
+				c.add(P.File);
 			} else {
 				if (itsWorth(P.File)) {
+					setWorth(P.File);
 					c.enqueue(P.File);
 				}
 			}
@@ -326,6 +339,17 @@ public class Operations {
 		return (v.Time);
 	}
 	
+	public boolean isPlayable(File file) {
+		String ext = FilenameUtils.getExtension(file.getName());
+		String[] formats = {"webm","mkv","flv","vob","ogv", "ogg","drc","gif","gifv","mng","avi","mov","qt","wmv","yuv","rm","rmvb","asf","mp4","m4p","m4v","mpg","mp2","mpeg","mpe","mpv","svi","3gp","3g2","mxf","roq","nsv","f4p","f4v","f4a","f4b"};
+		for(int i = 0; i < formats.length; i++){
+			if(formats[i].equalsIgnoreCase(ext)){
+				return true;
+			}
+		}
+			return false;
+	}
+	
 	public void Monitor(String File) {
 		Thread ContinPlay = new Thread(new Runnable(){
 			@Override
@@ -333,10 +357,21 @@ public class Operations {
 				if(Dfault.Contin){
 					File file = new File(File);
 					File Par = file.getParentFile();
-					 
+					File list[] = Par.listFiles();
+					for(int i = 0; i < list.length; i++){
+						if(isPlayable(list[i])){
+							String Path = list[i].getPath();
+							if(itsWorth(Path)){
+								setWorth(Path);
+								add(Path);
+							}
+						}
+					}
 				}
 			}
 		});
+		ContinPlay.setDaemon(true);
+		ContinPlay.start();
 		Video v = deserial(File);
 		if (v.Time != 0) {
 			if (Dfault.Resume) {
@@ -361,14 +396,7 @@ public class Operations {
 		if (curPlayingFlag.exists()) {
 			curPlayingFlag.delete();
 		}
-		File Dir = new File(Cache + "\\PlayLisst");
-		if (Dir.exists()) {
-			File list[] = Dir.listFiles();
-			for (int i = 0; i < list.length; i++) {
-				list[i].delete();
-			}
-			Dir.delete();
-		}
+		clearPlayList();
 		latch.countDown();
 		System.exit(0);
 	}
