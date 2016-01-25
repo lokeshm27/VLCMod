@@ -325,20 +325,32 @@ public class Operations {
 		Video v = deserial(File);
 		return (v.Time);
 	}
-
+	
 	public void Monitor(String File) {
+		Thread ContinPlay = new Thread(new Runnable(){
+			@Override
+			public void run(){
+				if(Dfault.Contin){
+					File file = new File(File);
+					File Par = file.getParentFile();
+					 
+				}
+			}
+		});
 		Video v = deserial(File);
-		if (Dfault.Resume) {
-			c.seek(v.Time);
-		} else if (Dfault.Ask) {
-			int resp = frame1();
-			if (resp == JOptionPane.YES_OPTION) {
+		if (v.Time != 0) {
+			if (Dfault.Resume) {
 				c.seek(v.Time);
+			} else if (Dfault.Ask) {
+				int resp = frame1();
+				if (resp == JOptionPane.YES_OPTION) {
+					c.seek(v.Time);
+				} else {
+					c.seek(0);
+				}
 			} else {
 				c.seek(0);
 			}
-		} else {
-			c.seek(0);
 		}
 	}
 
@@ -350,9 +362,9 @@ public class Operations {
 			curPlayingFlag.delete();
 		}
 		File Dir = new File(Cache + "\\PlayLisst");
-		if(Dir.exists()){
+		if (Dir.exists()) {
 			File list[] = Dir.listFiles();
-			for(int i = 0; i < list.length; i++){
+			for (int i = 0; i < list.length; i++) {
 				list[i].delete();
 			}
 			Dir.delete();
