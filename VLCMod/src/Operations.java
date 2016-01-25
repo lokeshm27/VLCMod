@@ -69,7 +69,7 @@ public class Operations {
 	public void setrunFlag() {
 		try {
 			Date date = new Date();
-			Session = date; 
+			Session = date;
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(runFlag));
 			oos.writeObject(date);
 			oos.close();
@@ -134,9 +134,9 @@ public class Operations {
 		}
 		System.exit(-1);
 	}
-	
-	public void add(String Path){
-		if(itsWorth(Path)){
+
+	public void add(String Path) {
+		if (itsWorth(Path)) {
 			setWorth(Path);
 			c.add(Path);
 		}
@@ -145,15 +145,16 @@ public class Operations {
 	public void process(Package P) {
 		if (P.command.equals("playLast")) {
 			Video V = getLastPlayed(P.File);
-			c.add(V.Path);
+			add(V.Path);
 			Monitor(V.Path);
 		} else {
 			if (P.command.equals("add") || P.command.equals("play")) {
-				c.add(P.File);
+				add(P.File);
 				Monitor(P.File);
 			} else {
-				c.enqueue(P.File);
-				Monitor(P.File);
+				if (itsWorth(P.File)) {
+					c.enqueue(P.File);
+				}
 			}
 		}
 	}
@@ -174,7 +175,7 @@ public class Operations {
 					String ret = (String) ois.readObject();
 					return ret;
 				} else {
-					System.exit(-1);
+					onClose();
 				}
 			} else {
 				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(data));
@@ -187,50 +188,50 @@ public class Operations {
 		return null;
 	}
 
-	public boolean itsWorth(String Path){
+	public boolean itsWorth(String Path) {
 		String Dir = Cache + "PlayList";
 		File PlayDir = new File(Dir);
-		if(!(PlayDir.exists())){
+		if (!(PlayDir.exists())) {
 			PlayDir.mkdir();
-			return false;
-		}else{
+			return true;
+		} else {
 			File file = new File(Dir + "\\" + encode(Path) + ".dat");
-			if(file.exists()){
+			if (file.exists()) {
 				try {
 					ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
 					Date date = (Date) in.readObject();
 					in.close();
-					if(date.equals(Session)){
+					if (date.equals(Session)) {
 						return false;
-					}else{
+					} else {
 						return true;
 					}
 				} catch (Exception e) {
 					errorHandler(134, e.getMessage(), "itsWorth", "Operations", true);
 				}
 				return false;
-			}else{
+			} else {
 				return true;
 			}
 		}
 	}
-	
-	public void setWorth(String Path){
+
+	public void setWorth(String Path) {
 		String Dir = Cache + "PlayList";
 		File PlayDir = new File(Dir);
-		if(!(PlayDir.exists())){
+		if (!(PlayDir.exists())) {
 			PlayDir.mkdir();
 		}
-		File datFile = new File(Dir + "//" + encode(Path) + ".dat");
+		File datFile = new File(Dir + "\\" + encode(Path) + ".dat");
 		try {
 			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(datFile));
 			out.writeObject(Session);
 			out.close();
-		}catch (Exception e) {
-			errorHandler(135,  e.getMessage(), "setWorth", "Operations", true);
+		} catch (Exception e) {
+			errorHandler(135, e.getMessage(), "setWorth", "Operations", true);
 		}
 	}
-	
+
 	public void serial(Video v) {
 		try {
 			File vid = new File(v.Path);
@@ -327,16 +328,16 @@ public class Operations {
 
 	public void Monitor(String File) {
 		Video v = deserial(File);
-		if(Dfault.Resume){
+		if (Dfault.Resume) {
 			c.seek(v.Time);
-		}else if(Dfault.Ask){
+		} else if (Dfault.Ask) {
 			int resp = frame1();
-			if(resp == JOptionPane.YES_OPTION){
+			if (resp == JOptionPane.YES_OPTION) {
 				c.seek(v.Time);
-			}else{
+			} else {
 				c.seek(0);
 			}
-		}else{
+		} else {
 			c.seek(0);
 		}
 	}
@@ -347,6 +348,14 @@ public class Operations {
 		}
 		if (curPlayingFlag.exists()) {
 			curPlayingFlag.delete();
+		}
+		File Dir = new File(Cache + "\\PlayLisst");
+		if(Dir.exists()){
+			File list[] = Dir.listFiles();
+			for(int i = 0; i < list.length; i++){
+				list[i].delete();
+			}
+			Dir.delete();
 		}
 		latch.countDown();
 		System.exit(0);
@@ -570,19 +579,19 @@ public class Operations {
 		frame.dispose();
 	}
 
-	public void errorFrame(Component c, String Msg, String Title, int Type){
+	public void errorFrame(Component c, String Msg, String Title, int Type) {
 		CountDownLatch errorLatch = new CountDownLatch(1);
-		
+
 		JFrame frame = new JFrame(Title);
 		frame.setAlwaysOnTop(true);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
-		
+
 		ImageIcon icon = new ImageIcon(this.getClass().getResource("/imag.JPG"));
 		JLabel label = new JLabel(Msg);
 		label.setIcon(icon);
-		
+
 		JButton ok = new JButton("OK");
 		ok.addActionListener(new ActionListener() {
 			@Override
@@ -591,19 +600,19 @@ public class Operations {
 				errorLatch.countDown();
 			}
 		});
-		
+
 		JPanel p = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(10, 10, 10, 10);
-		
+
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		p.add(label ,gbc);
-		
+		p.add(label, gbc);
+
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		p.add(ok ,gbc);
-		
+		p.add(ok, gbc);
+
 		frame.add(p, BorderLayout.CENTER);
 		frame.pack();
 		frame.setVisible(true);
