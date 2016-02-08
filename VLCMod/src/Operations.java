@@ -391,22 +391,24 @@ public class Operations {
 			@Override
 			public void run() {
 				try {
+					String MonitorFile = File;
 					boolean ok = true;
 					while (ok) {
 						if (c.isPlaying()) {
 							String Title = c.getTitle();
-							if (Title.equals(File)) {
+							if (Title.equals(MonitorFile)) {
 								int Length = c.getLength();
 								int time = c.getTime();
 								if (time >= (Length - 4)) {
-									serial(new Video(File, 0));
+									serial(new Video(MonitorFile, 0));
 									Thread.sleep(Dfault.performance * 1000);
 								} else {
-									serial(new Video(File, time));
+									serial(new Video(MonitorFile, time));
 									Thread.sleep(Dfault.performance * 1000);
 								}
 							} else {
-								fileChangeHandler(File);
+								fileChangeHandler(Title);
+								MonitorFile = Title;
 							}
 						} else {
 							Thread.sleep(Dfault.performance * 1000);
@@ -417,6 +419,8 @@ public class Operations {
 				}
 			}
 		});
+		MonitorThread.setDaemon(true);
+		MonitorThread.start();
 	}
 
 	public void onClose() {
@@ -609,10 +613,6 @@ public class Operations {
 	}
 
 	public void fileChangeHandler(String File) {
-		JFrame frame = new JFrame("Processing");
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setVisible(true);
-		frame.setLocationRelativeTo(null);
 		File newFile = new File(File);
 		if (!newFile.exists()) {
 			int res = frame2();
@@ -634,7 +634,7 @@ public class Operations {
 			String Par = newFile.getParent();
 			File ParDir = new File(Par);
 			if (ParDir.exists()) {
-				Monitor(File);
+				return;
 			} else {
 				int res = frame2();
 				if (res == JOptionPane.YES_OPTION) {
@@ -645,7 +645,6 @@ public class Operations {
 				}
 			}
 		}
-		frame.dispose();
 	}
 
 	public void errorFrame(Component c, String Msg, String Title, int Type) {
