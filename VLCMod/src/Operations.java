@@ -357,7 +357,7 @@ public class Operations {
 					File file = new File(File);
 					File Par = file.getParentFile();
 					File list[] = Par.listFiles();
-					for (int i = 0; i < list.length; i++) {
+					for (int i = (list.length) - 1; i >= 0; i--) {
 						if (isPlayable(list[i])) {
 							String Path = list[i].getPath();
 							if (itsWorth(Path)) {
@@ -386,6 +386,37 @@ public class Operations {
 				c.seek(0);
 			}
 		}
+
+		Thread MonitorThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					boolean ok = true;
+					while (ok) {
+						if (c.isPlaying()) {
+							String Title = c.getTitle();
+							if (Title.equals(File)) {
+								int Length = c.getLength();
+								int time = c.getTime();
+								if (time >= (Length - 4)) {
+									serial(new Video(File, 0));
+									Thread.sleep(Dfault.performance * 1000);
+								} else {
+									serial(new Video(File, time));
+									Thread.sleep(Dfault.performance * 1000);
+								}
+							} else {
+								fileChangeHandler(File);
+							}
+						} else {
+							Thread.sleep(Dfault.performance * 1000);
+						}
+					}
+				} catch (Exception e) {
+					errorHandler(128, e.getMessage(), "MonitorThread", "Operations", true);
+				}
+			}
+		});
 	}
 
 	public void onClose() {
