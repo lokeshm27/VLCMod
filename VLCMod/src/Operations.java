@@ -42,8 +42,10 @@ public class Operations {
 	public final CountDownLatch latch = new CountDownLatch(1);
 	public final CountDownLatch latch2 = new CountDownLatch(1);
 	public final CountDownLatch latch3 = new CountDownLatch(1);
+	public final CountDownLatch latch4 = new CountDownLatch(1);
 	static int ret;
 	Date Session;
+	
 
 	public Operations() {
 		try {
@@ -465,6 +467,11 @@ public class Operations {
 		});
 		MonitorThread.setDaemon(true);
 		MonitorThread.start();
+		try {
+			latch4.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void onClose() {
