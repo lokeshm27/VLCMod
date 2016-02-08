@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -14,12 +15,15 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -392,25 +396,62 @@ public class Operations {
 			public void run() {
 				try {
 					String MonitorFile = File;
+					JFrame frame  = new JFrame("Monitoring - " + MonitorFile);
+					frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+					frame.setSize(400, 400);
+					frame.setResizable(false);
+					
+					JTextArea text = new JTextArea();
+					text.setEditable(false);
+					text.setFont(new Font("Serif", Font.PLAIN, 15));
+					text.setLineWrap(true);
+					
+					JScrollPane scroll = new JScrollPane(text);
+					frame.add(scroll);
+					frame.setLocationRelativeTo(null);
+					frame.setVisible(true);
+					int Length = c.getLength();
+					text.append("--- Monitoring '" + MonitorFile + "'----\n");
+					text.append("\n");
+					text.append("\n");
+					text.append("Total Length of the Video = " + Length + "\n");
+					text.append("\n");
 					boolean ok = true;
 					while (ok) {
 						if (c.isPlaying()) {
+							text.append("isPlaying = 1\n");
 							String Title = c.getTitle();
+							text.append("Title = " + Title + "\n");
 							if (Title.equals(MonitorFile)) {
-								int Length = c.getLength();
+								text.append("Proceeding...\n");
 								int time = c.getTime();
-								if (time >= (Length - 4)) {
+								if (time >= (Length - 4)){
+									text.append("Since Time >= Length - 4, Serial(0)\n");
+									text.append("\n");
+									text.append("Itiration Complete...\n");
+									text.append("\n");
+									text.append("\n");
 									serial(new Video(MonitorFile, 0));
 									Thread.sleep(Dfault.performance * 1000);
 								} else {
+									text.append("Serail( " + time + ")\n");
+									text.append("\n");
+									text.append("Iteration Complete..\n");
+									text.append("\n");
+									text.append("\n");
 									serial(new Video(MonitorFile, time));
 									Thread.sleep(Dfault.performance * 1000);
 								}
 							} else {
+								text.append("File Changed, Waiting for fileChangeHandler..\n");
 								fileChangeHandler(Title);
+								text.append("Got +ve response. Changing MonitorFile = " + Title + "\n");
 								MonitorFile = Title;
+								frame.setVisible(false);
+								frame.setVisible(true);
 							}
 						} else {
+							text.append("isPlaying = 0, Waiting..\n");
 							Thread.sleep(Dfault.performance * 1000);
 						}
 					}
