@@ -447,11 +447,14 @@ public class Operations {
 								fileChangeHandler(Title);
 								text.append("Got +ve response. Changing MonitorFile = " + Title + "\n");
 								MonitorFile = Title;
+								text.append("--- Monitoring " + MonitorFile + " ---\n");
 								frame.setVisible(false);
 								frame.setVisible(true);
 							}
 						} else {
 							text.append("isPlaying = 0, Waiting..\n");
+							text.append("\n");
+							text.append("\n");
 							Thread.sleep(Dfault.performance * 1000);
 						}
 					}
