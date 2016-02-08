@@ -143,13 +143,13 @@ public class Operations {
 			c.add(Path);
 		}
 	}
-	
-	public void clearPlayList(){
+
+	public void clearPlayList() {
 		String Dir = Cache + "PlayList";
 		File PlayDir = new File(Dir);
-		if(PlayDir.exists()){
+		if (PlayDir.exists()) {
 			File list[] = PlayDir.listFiles();
-			for(int i = 0; i < list.length; i++){
+			for (int i = 0; i < list.length; i++) {
 				list[i].delete();
 			}
 			PlayDir.delete();
@@ -164,10 +164,7 @@ public class Operations {
 			if (P.command.equals("add") || P.command.equals("play")) {
 				c.add(P.File);
 			} else {
-				if (itsWorth(P.File)) {
-					setWorth(P.File);
-					c.enqueue(P.File);
-				}
+				c.enqueue(P.File);
 			}
 		}
 	}
@@ -338,30 +335,32 @@ public class Operations {
 		Video v = deserial(File);
 		return (v.Time);
 	}
-	
+
 	public boolean isPlayable(File file) {
 		String ext = FilenameUtils.getExtension(file.getName());
-		String[] formats = {"webm","mkv","flv","vob","ogv", "ogg","drc","gif","gifv","mng","avi","mov","qt","wmv","yuv","rm","rmvb","asf","mp4","m4p","m4v","mpg","mp2","mpeg","mpe","mpv","svi","3gp","3g2","mxf","roq","nsv","f4p","f4v","f4a","f4b"};
-		for(int i = 0; i < formats.length; i++){
-			if(formats[i].equalsIgnoreCase(ext)){
+		String[] formats = { "webm", "mkv", "flv", "vob", "ogv", "ogg", "drc", "gif", "gifv", "mng", "avi", "mov", "qt",
+				"wmv", "yuv", "rm", "rmvb", "asf", "mp4", "m4p", "m4v", "mpg", "mp2", "mpeg", "mpe", "mpv", "svi",
+				"3gp", "3g2", "mxf", "roq", "nsv", "f4p", "f4v", "f4a", "f4b" };
+		for (int i = 0; i < formats.length; i++) {
+			if (formats[i].equalsIgnoreCase(ext)) {
 				return true;
 			}
 		}
-			return false;
+		return false;
 	}
-	
+
 	public void Monitor(String File) {
-		Thread ContinPlay = new Thread(new Runnable(){
+		Thread ContinPlay = new Thread(new Runnable() {
 			@Override
-			public void run(){
-				if(Dfault.Contin){
+			public void run() {
+				if (Dfault.Contin) {
 					File file = new File(File);
 					File Par = file.getParentFile();
 					File list[] = Par.listFiles();
-					for(int i = 0; i < list.length; i++){
-						if(isPlayable(list[i])){
+					for (int i = 0; i < list.length; i++) {
+						if (isPlayable(list[i])) {
 							String Path = list[i].getPath();
-							if(itsWorth(Path)){
+							if (itsWorth(Path)) {
 								setWorth(Path);
 								add(Path);
 							}
@@ -414,10 +413,9 @@ public class Operations {
 	public int frame1() {
 		try {
 			JFrame frame = new JFrame("VLCMod - Resume or Start Over?");
-			frame.setResizable(true);
+			frame.setResizable(false);
 			frame.setAlwaysOnTop(true);
 			frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			frame.setResizable(true);
 			frame.setVisible(false);
 
 			JLabel label1 = new JLabel("Do you whish to resume from where you have left last time or to Start Over?");
@@ -463,8 +461,8 @@ public class Operations {
 
 			frame.add(p1, BorderLayout.CENTER);
 			frame.getRootPane().setDefaultButton(resume);
-			frame.setLocationRelativeTo(null);
 			frame.pack();
+			frame.setLocationRelativeTo(null);
 			frame.setVisible(true);
 			latch2.await();
 			frame.dispose();
@@ -480,7 +478,6 @@ public class Operations {
 			frame.setResizable(false);
 			frame.setAlwaysOnTop(true);
 			frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			frame.setLocationRelativeTo(null);
 			frame.setVisible(false);
 
 			JLabel label1 = new JLabel("VLC Playing File Changed Unexcpectedly.!");
@@ -570,6 +567,7 @@ public class Operations {
 			frame.add(p3, BorderLayout.CENTER);
 			frame.getRootPane().setDefaultButton(close);
 			frame.pack();
+			frame.setLocationRelativeTo(null);
 			frame.setVisible(true);
 			latch3.await();
 			frame.dispose();
@@ -626,7 +624,6 @@ public class Operations {
 		frame.setAlwaysOnTop(true);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setResizable(false);
-		frame.setLocationRelativeTo(null);
 
 		ImageIcon icon = new ImageIcon(this.getClass().getResource("/imag.JPG"));
 		JLabel label = new JLabel(Msg);
@@ -655,6 +652,7 @@ public class Operations {
 
 		frame.add(p, BorderLayout.CENTER);
 		frame.pack();
+		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		try {
 			errorLatch.await();
